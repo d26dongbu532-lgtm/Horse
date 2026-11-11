@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>HORSE WORLD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#f4c76b;--glass:rgba(17,28,25,.78);--line:rgba(255,255,255,.16)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#8fc5a0;font-family:'Noto Sans KR',sans-serif;color:#fff}
+#game{position:fixed;inset:0}canvas{display:block}
+.panel{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(14px);box-shadow:0 12px 40px #10251c40;border-radius:16px}
+#topbar{position:absolute;top:16px;left:16px;right:16px;display:flex;align-items:center;justify-content:space-between;pointer-events:none}
+.brand{font-family:'Black Han Sans';font-size:clamp(20px,3vw,30px);letter-spacing:1px;text-shadow:0 3px 14px #183629}
+.brand span{color:var(--gold)}.stats{display:flex;gap:8px}.pill{padding:9px 13px;font-size:12px;font-weight:700}
+#zone{position:absolute;top:78px;left:18px;padding:9px 13px;font-size:12px;color:#f8e9bf}
+#profile{position:absolute;top:78px;right:18px;padding:9px 13px;font-size:12px}
+#chat{position:absolute;left:16px;bottom:18px;width:min(340px,calc(100vw - 32px));height:220px;display:flex;flex-direction:column;overflow:hidden}
+#messages{flex:1;overflow:auto;padding:12px 13px;font-size:12px;line-height:1.6;scrollbar-width:thin}
+.msg{margin:0 0 5px;overflow-wrap:anywhere}.msg b{color:var(--gold);margin-right:5px}.sys{color:#b9d5c4;font-style:italic}
+#chatform{display:flex;gap:6px;padding:9px;border-top:1px solid var(--line)}
+input{min-width:0;flex:1;background:#ffffff12;border:1px solid #ffffff25;border-radius:9px;color:#fff;padding:10px 11px;outline:none;font:inherit;font-size:12px}
+input::placeholder{color:#c1cec5}button{border:0;border-radius:9px;background:var(--gold);color:#3a2b12;font-weight:900;padding:0 14px;cursor:pointer}
+#help{position:absolute;right:16px;bottom:18px;padding:12px 14px;font-size:11px;line-height:1.8;color:#e5eee8}
+#help strong{color:var(--gold)}
+#join{position:fixed;inset:0;z-index:5;display:grid;place-items:center;background:linear-gradient(135deg,#10251dcc,#193b2dcc)}
+#join .box{width:min(420px,calc(100vw - 34px));padding:30px;text-align:center}
+.logo{font-family:'Black Han Sans';font-size:46px;line-height:1.1;margin:5px 0 8px}.logo span{color:var(--gold)}
+.sub{font-size:13px;color:#d0ded4;margin-bottom:24px}.field{text-align:left;font-size:12px;color:#d8e5dc;margin:12px 0 7px}
+#nickname{width:100%;padding:14px;font-size:15px;background:#ffffff14}
+#enter{width:100%;padding:14px;margin-top:14px;font-size:15px}
+.note{font-size:10px;color:#b3c7ba;margin-top:16px}
+#toast{position:absolute;top:120px;left:50%;transform:translateX(-50%);padding:9px 14px;font-size:12px;opacity:0;transition:.25s;pointer-events:none}
+#mobile{display:none;position:absolute;inset:auto 0 20px 0;justify-content:space-between;padding:0 22px;pointer-events:none}
+#stick{width:112px;height:112px;border-radius:50%;background:#14271d70;border:1px solid #ffffff50;position:relative;pointer-events:auto;touch-action:none}
+#knob{position:absolute;width:44px;height:44px;left:33px;top:33px;border-radius:50%;background:#f4c76bcc;border:2px solid #fff}
+.actions{display:flex;align-items:end;gap:10px;pointer-events:auto}
+.act{width:58px;height:58px;border-radius:50%;font-size:11px;border:2px solid #fff8}
+#reconnect{display:none;position:absolute;inset:0;place-items:center;background:#10251d99;font-weight:700}
+@media(max-width:700px){#help{display:none}#mobile{display:flex}#chat{height:170px;bottom:150px;width:min(300px,calc(100vw - 32px))}#zone{top:68px}#profile{top:68px}#topbar{top:12px}#join .box{padding:24px}}
+</style>
+</head>
+<body>
+<div id="game"></div>
+<div id="topbar"><div class="brand">HORSE <span>WORLD</span></div><div class="stats"><div class="panel pill">🟢 접속 <b id="online">0</b>명</div><div class="panel pill">🌍 멀티플레이</div></div></div>
+<div id="zone" class="panel">🌿 초원 지대</div><div id="profile" class="panel">🐴 <span id="myname">방문자</span></div>
+<div id="chat" class="panel"><div id="messages"><div class="msg sys">HORSE WORLD에 오신 것을 환영합니다!</div></div><form id="chatform"><input id="chatinput" maxlength="120" placeholder="친구들에게 말을 걸어보세요..." autocomplete="off"><button>전송</button></form></div>
+<div id="help" class="panel"><strong>WASD</strong> 이동　<strong>SHIFT</strong> 달리기<br><strong>SPACE</strong> 점프　마우스 드래그: 시점 회전<br>휠: 줌　다른 말에게 다가가 인사해 보세요!</div>
+<div id="mobile"><div id="stick"><div id="knob"></div></div><div class="actions"><button class="act" id="run">달리기</button><button class="act" id="jump">점프</button></div></div>
+<div id="toast" class="panel"></div>
+<div id="join"><div class="box panel"><div style="font-size:38px">🐴</div><div class="logo">HORSE <span>WORLD</span></div><div class="sub">친구들과 함께 달리는 나만의 말 오픈월드</div><div class="field">나의 닉네임</div><input id="nickname" maxlength="14" placeholder="닉네임을 입력하세요" autocomplete="off"><button id="enter">초원으로 입장하기　➜</button><div class="note">닉네임은 다른 플레이어에게 공개됩니다.</div></div></div>
+<div id="reconnect">서버와 연결 중...</div>
+<script src="/socket.io/socket.io.js"></script>
+<script type="module" src="/game.js"></script>
+</body></html>
